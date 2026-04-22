@@ -1,0 +1,124 @@
+# ============================================================
+# Federated Multi-Agent Learning - Configuration
+# Aspect 02: Federated IDS across Supply Chain Organizations
+# ============================================================
+
+# --- Dataset ---
+dataset:
+  name: "CICIDS2017"
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  results_dir: "data/results"
+  # CICIDS2017 CSV files to use
+  files:
+    - "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv"
+    - "Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv"
+    - "Friday-WorkingHours-Morning.pcap_ISCX.csv"
+    - "Wednesday-workingHours.pcap_ISCX.csv"
+    - "Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv"
+    - "Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv"
+    - "Tuesday-WorkingHours.pcap_ISCX.csv"
+    - "Monday-WorkingHours.pcap_ISCX.csv"
+  test_split: 0.2
+  val_split: 0.1
+  random_seed: 42
+
+# --- Attack Categories Mapping ---
+attack_mapping:
+  # Map CICIDS2017 labels to binary + multi-class
+  benign: "BENIGN"
+  attack_categories:
+    DoS: ["DoS Hulk", "DoS GoldenEye", "DoS slowloris", "DoS Slowhttptest"]
+    DDoS: ["DDoS"]
+    BruteForce: ["FTP-Patator", "SSH-Patator"]
+    WebAttack: ["Web Attack – Brute Force", "Web Attack – XSS", "Web Attack – Sql Injection"]
+    Infiltration: ["Infiltration"]
+    PortScan: ["PortScan"]
+    Botnet: ["Bot"]
+
+# --- Model (CNN-LSTM) ---
+model:
+  # CNN parameters
+  cnn_filters: [64, 128]
+  cnn_kernel_size: 3
+  cnn_dropout: 0.3
+  # LSTM parameters
+  lstm_hidden_size: 128
+  lstm_num_layers: 2
+  lstm_dropout: 0.2
+  # Classifier head
+  fc_hidden: 64
+  num_classes: 2  # binary: benign vs attack (change to 8 for multi-class)
+
+# --- Training ---
+training:
+  batch_size: 256
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  epochs_per_round: 5  # local epochs per federated round
+  standalone_epochs: 30  # for standalone/centralized training
+  optimizer: "adam"
+  scheduler: "cosine"
+  early_stopping_patience: 5
+
+# --- Federated Learning ---
+federated:
+  num_organizations: 5  # supply chain partners
+  num_rounds: 10  # federated communication rounds
+  # Organization names (simulating supply chain)
+  org_names:
+    - "Supplier_RawMaterials"
+    - "Supplier_Components"
+    - "Manufacturer_Assembly"
+    - "Logistics_Provider"
+    - "OEM_Distributor"
+  # Data partition strategy
+  partition:
+    strategy: "dirichlet"  # non-IID distribution
+    alpha: 0.5  # lower = more non-IID (heterogeneous)
+  # Aggregation
+  aggregation: "coordinate_median"  # Options: fedavg, coordinate_median
+  # Defenses
+  defenses:
+    gradient_clipping:
+      enabled: true
+      clip_factor: 1.5  # clip at 1.5x median norm
+    cosine_similarity:
+      enabled: true
+      threshold: -0.3  # flag if below this
+    reputation:
+      enabled: true
+      initial_score: 100
+      flag_penalty: 20
+      exclusion_threshold: 40
+
+# --- Poisoning Attacks (Week 10) ---
+poisoning:
+  compromise_ratios: [0.1, 0.2, 0.3]  # 10%, 20%, 30%
+  untargeted:
+    noise_scale: 5.0  # Gaussian noise multiplier
+  targeted:
+    target_class: "DoS"  # class to misclassify
+    flip_to: "BENIGN"  # flip label to
+
+# --- Blockchain (Week 11) ---
+blockchain:
+  network: "hyperledger_fabric"
+  version: "2.5"
+  num_peers: [2, 4, 8, 16]  # scalability test
+  block_sizes: [10, 50, 100, 500]
+  block_timeouts: [0.5, 1.0, 2.0, 5.0]
+  target_tps: 50
+  target_latency_ms: 2000
+
+# --- Statistical Validation (Week 12) ---
+statistics:
+  num_runs: 30
+  significance_level: 0.05
+  seeds: "range(42, 72)"  # 30 different seeds
+
+# --- Baselines ---
+baselines:
+  - "xgboost"
+  - "autoencoder"
+  - "snort_rules"
