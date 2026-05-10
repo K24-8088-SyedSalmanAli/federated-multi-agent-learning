@@ -44,3 +44,28 @@ scipy>=1.11.0
 # Visualization
 matplotlib>=3.7.0
 seaborn>=0.12.0
+
+
+
+
+# # Federated Multi-Agent Learning - Requirements
+# # Aspect 02: Federated IDS across Supply Chain Organizations
+
+# # Core ML
+# torch>=2.0.0
+# numpy>=1.24.0
+# pandas>=2.0.0
+# scikit-learn>=1.3.0
+
+# # Baselines
+# xgboost>=2.0.0
+
+# # Configuration
+# pyyaml>=6.0
+
+# # Statistical Analysis (Week 12)
+# scipy>=1.11.0
+
+# # Visualization (for figures)
+# matplotlib>=3.7.0
+# seaborn>=0.12.0
