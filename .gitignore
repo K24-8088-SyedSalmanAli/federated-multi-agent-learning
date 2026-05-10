@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+*.egg
+dist/
+build/
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# Data files (large — don't push to GitHub)
+data/raw/
+data/processed/
+data/results/
+*.npy
+*.csv
+*.h5
+
+# Model files (large)
+*.pt
+*.pth
+*.pkl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
